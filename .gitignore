@@ -1,0 +1,9 @@
+﻿build/
+Game/
+itch_release/
+*.exe
+*.dll
+*.bak
+*.old*
+*.zip
+*.log

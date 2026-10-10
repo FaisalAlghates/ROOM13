@@ -1,0 +1,637 @@
+﻿<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>ROOM 13 - Game Design Document</title>
+<style>
+  @page{size:A4;margin:0}
+  :root{--ink:#14181a;--mute:#6b7478;--line:#d9dedf;--blood:#b0102a;--teal:#1f5a55;--paper:#ffffff;--soft:#f3f5f5}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  body{font-family:"Segoe UI","Segoe UI Variable Text",Arial,sans-serif;color:var(--ink);font-size:9.6pt;line-height:1.42;background:#fff;counter-reset:pg}
+  .page{width:210mm;height:297mm;padding:16mm 19mm 20mm;position:relative;page-break-after:always;break-after:page;overflow:hidden;counter-increment:pg}
+  .page::after{content:"ROOM 13  \00B7  Game Design Document  \00B7  v1.0  \00B7  " counter(pg);position:absolute;left:19mm;right:19mm;bottom:8mm;
+    font-size:7.6pt;letter-spacing:.14em;text-transform:uppercase;color:#9aa3a6;border-top:1px solid var(--line);padding-top:3mm}
+  .page.cover::after,.page.nofoot::after{display:none}
+
+  /* ---- headings in the template's voice ---- */
+  h1.sec{font-family:"Segoe UI Light","Segoe UI",sans-serif;font-weight:300;font-size:15pt;letter-spacing:.06em;text-transform:uppercase;color:#5f686c;margin:0 0 4mm;
+         padding-bottom:2mm;border-bottom:2px solid var(--blood);display:inline-block;min-width:60mm}
+  h2{font-size:11.2pt;font-weight:600;margin:4.4mm 0 1mm;color:var(--ink)}
+  h2 small{display:block;font-size:8.6pt;font-weight:400;color:var(--mute);margin-top:.3mm}
+  h3{font-size:10.4pt;font-weight:600;margin:3.5mm 0 .8mm;color:var(--teal)}
+  p{margin:0 0 2.2mm}
+  ul{margin:0 0 3mm 5mm} li{margin:0 0 1mm}
+  .lead{font-size:10.4pt;line-height:1.5;color:#222}
+  .tpl{font-size:8.2pt;color:var(--mute);margin-top:-.8mm;margin-bottom:1.5mm;font-style:italic}
+
+  /* ---- fact rows (Game Name / Genre / ...) ---- */
+  .facts{display:grid;grid-template-columns:42mm 1fr;border-top:1px solid var(--line)}
+  .facts>div{padding:1.9mm 0;border-bottom:1px solid var(--line)}
+  .facts .k{font-weight:600;color:var(--ink)} .facts .k i{display:block;font-style:normal;font-weight:400;font-size:7.8pt;color:var(--mute);line-height:1.3;margin-top:.6mm}
+  .facts .v{padding-left:3mm}
+  .name{font-family:"Bahnschrift","Segoe UI",sans-serif;font-weight:700;font-size:24pt;letter-spacing:.04em;line-height:1}
+  .name b{color:var(--blood)}
+
+  /* ---- tables ---- */
+  table.tbl{width:100%;border-collapse:collapse;font-size:8.5pt;margin:1.2mm 0 3mm}
+  table.tbl th{background:#101517;color:#fff;text-align:left;font-weight:600;padding:1.4mm 2.2mm;font-size:8.2pt;letter-spacing:.06em;text-transform:uppercase}
+  table.tbl td{padding:1.35mm 2.2mm;border-bottom:1px solid var(--line);vertical-align:top}
+  table.tbl tr:nth-child(even) td{background:var(--soft)}
+  table.tbl td:first-child{font-weight:600;white-space:nowrap}
+  .pill{display:inline-block;padding:.2mm 2mm;border-radius:2mm;background:#101517;color:#fff;font-size:7.6pt;font-weight:600;letter-spacing:.05em}
+  .pill.r{background:var(--blood)} .pill.t{background:var(--teal)}
+
+  /* ---- figures ---- */
+  figure{margin:1.5mm 0 3mm} figure img{display:block;width:100%;border:1px solid #cfd5d6}
+  figure.short img{height:44mm;object-fit:cover} figure.mid img{height:62mm;object-fit:cover}
+  figcaption{font-size:7.8pt;color:var(--mute);margin-top:1.2mm}
+  .row2{display:grid;grid-template-columns:1fr 1fr;gap:4mm} .row3{display:grid;grid-template-columns:repeat(3,1fr);gap:3mm}
+  .row2 figure,.row3 figure{margin:0}
+  .loop{display:flex;align-items:stretch;gap:1.4mm;margin:2mm 0}
+  .loop div{flex:1;border:1px solid var(--line);border-top:3px solid var(--blood);background:var(--soft);padding:2mm 2.2mm;font-size:8pt;line-height:1.3;color:#3a4448}
+  .loop div b{display:block;font-size:9pt;letter-spacing:.1em;color:#14181a;margin-bottom:.6mm}
+  .loop i{align-self:center;font-style:normal;color:var(--blood);font-weight:700}
+  .callout{border-left:3px solid var(--blood);background:var(--soft);padding:2.6mm 3.6mm;margin:2.5mm 0 4mm;font-size:9.4pt}
+  .callout b{color:var(--blood)}
+  .kbd{display:inline-block;min-width:6.2mm;padding:0 1.6mm;border:1px solid #9aa3a6;border-bottom-width:2px;border-radius:1.2mm;background:#fff;font:600 8pt/1.5 "Consolas",monospace;text-align:center}
+
+  /* ---- cover ---- */
+  .cover{background:#050707;color:#e9e4da;padding:0}
+  .cover .art{position:absolute;inset:0;background:url(hero_nohud.jpg) 50% 30%/auto 175mm no-repeat}
+  .cover .art::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(5,7,7,.55) 0,rgba(5,7,7,0) 24%,rgba(5,7,7,0) 40%,rgba(5,7,7,.92) 66%,#050707 82%),radial-gradient(ellipse 85% 60% at 50% 38%,transparent 40%,rgba(5,7,7,.7) 100%)}
+  .cover .t{position:absolute;left:20mm;right:20mm;top:20mm;font-size:9pt;letter-spacing:.5em;text-transform:uppercase;color:#aab8b3;font-weight:300}
+  .cover .t i{display:block;width:30mm;height:2px;background:var(--blood);margin-top:4mm}
+  .cover .big{position:absolute;left:0;right:0;top:158mm;text-align:center;font-family:"Bahnschrift","Impact",sans-serif;font-weight:700;font-size:112pt;letter-spacing:.03em;line-height:.9;white-space:nowrap;
+     transform:scaleX(.75);text-shadow:0 0 22mm rgba(176,16,42,.35)}
+  .cover .big b{color:#d4152a;text-shadow:0 0 18mm rgba(212,21,42,.7)}
+  .cover .sub{position:absolute;left:0;right:0;top:206mm;text-align:center;font-family:"Consolas",monospace;font-size:15pt;letter-spacing:.4em;color:#ff4458;text-shadow:0 0 5mm rgba(255,40,60,.6)}
+  .cover .doc{position:absolute;left:0;right:0;top:222mm;text-align:center;font-size:12pt;letter-spacing:.45em;text-transform:uppercase;font-weight:600}
+  .cover .meta{position:absolute;left:20mm;right:20mm;bottom:16mm;display:grid;grid-template-columns:1fr 1.5fr 1fr;gap:4mm;font-size:7.6pt;letter-spacing:.14em;text-transform:uppercase;color:#8fa19b;line-height:1.7;border-top:1px solid rgba(233,228,218,.25);padding-top:4mm}
+  .cover .meta b{color:#e9e4da;font-weight:600}
+
+  /* ---- misc ---- */
+  .two{display:grid;grid-template-columns:1fr 1fr;gap:6mm}
+  .toc{columns:2;column-gap:8mm;font-size:9.4pt} .toc div{display:flex;justify-content:space-between;border-bottom:1px dotted #b5bcbf;padding:.8mm 0}
+  .rtl{direction:rtl;text-align:right;font-family:"Segoe UI","Sakkal Majalla",sans-serif;font-size:9.6pt;line-height:1.7}
+  .rtl h1.sec{font-family:"Segoe UI","Sakkal Majalla",sans-serif;font-weight:600;letter-spacing:0;text-transform:none;font-size:16pt}
+  .rtl h2{font-family:"Segoe UI","Sakkal Majalla",sans-serif} .rtl ul{margin:0 5mm 3mm 0}
+  svg text{font-family:"Segoe UI",Arial,sans-serif}
+</style>
+</head>
+<body>
+
+<!-- ============================ COVER ============================ -->
+<section class="page cover">
+  <div class="art"></div>
+  <div class="t">Game Design Document<i></i></div>
+  <div class="big">ROOM <b>13</b></div>
+  <div class="sub">03:17 AM</div>
+  <div class="doc">Game Design Document (GDD)</div>
+  <div class="meta">
+    <div>Version <b>1.0</b><br>7 October 2026<br>Status <b>Playable build</b></div>
+    <div style="text-align:center">First-person psychological horror<br>PC · Windows 10/11 · Unity 6 HDRP</div>
+    <div style="text-align:right">Design · Code · Audio · Level<br><b>Eng. Faisal</b> · المهندس فيصل</div>
+  </div>
+</section>
+
+<!-- ============================ P1 OVERVIEW ============================ -->
+<section class="page">
+  <h1 class="sec">Game Design Document (GDD)</h1>
+  <div class="facts">
+    <div class="k">Game Name:</div><div class="v"><span class="name">ROOM <b>13</b></span></div>
+    <div class="k">Genre:</div><div class="v">First-person psychological horror · stealth &amp; survival. Single-player, story-driven, about 7 minutes of linear play with a built-in checkpoint loop.</div>
+    <div class="k">Game Elements:<i>The basic activities the player does for fun</i></div>
+    <div class="v"><ul style="margin:0 0 0 4mm">
+      <li><b>Explore</b> a decaying hospital at 03:17 AM, in the dark, one corridor at a time.</li>
+      <li><b>Manage light:</b> a flashlight with a draining battery, spare batteries, and a darkness the Patient prefers.</li>
+      <li><b>Stay unseen:</b> sneak, hide in lockers with the light off, throw a pipe to pull the Patient away.</li>
+      <li><b>Hold him back with light:</b> the Patient cannot approach while he is lit; he only moves when not observed.</li>
+      <li><b>Solve the route:</b> keycards, locked doors, CCTV monitors, documents and a phone/map.</li>
+      <li><b>Run:</b> sprint, slide under low obstacles in the final chase, reach the exit.</li>
+    </ul></div>
+    <div class="k">Player:<i>Number of players at once</i></div><div class="v">1 (single-player, offline).</div>
+  </div>
+
+  <h1 class="sec" style="margin-top:6mm">Technical Specs</h1>
+  <div class="facts">
+    <div class="k">Technical Form:<i>2D (flat) or 3D (form)</i></div><div class="v">Real-time 3D. Unity 6 High Definition Render Pipeline: volumetric fog, per-light shadows, bloom/grain/chromatic aberration. <b>All geometry, props, textures and audio are generated procedurally by code at start-up</b> - no imported art or audio files.</div>
+    <div class="k">View:<i>Camera view for the player</i></div><div class="v">First person. Eye height 1.62 m standing / 0.95 m crouched; head-bob, camera roll, shake, and a controlled fear camera in scripted moments.</div>
+    <div class="k">Platform:</div><div class="v">PC - Windows 10/11 64-bit, DirectX 12 GPU (Mono scripting backend). Distributed as a zip with launcher for itch.io.</div>
+    <div class="k">Language:<i>Programming</i></div><div class="v">C# (Unity 6000.x, Mono). Interface and story texts in <b>English and Arabic</b> (right-to-left shaping implemented in code).</div>
+    <div class="k">Device:</div><div class="v">PC (keyboard + mouse). Mobile and console are not targeted.</div>
+  </div>
+
+  <div class="callout" style="margin-top:5mm"><b>One-line pitch.</b> You are Patient 013. The hospital has twelve rooms and a thirteenth door that should not exist. Something tall and silent only moves when you stop looking at it - so you keep the light on him and run.</div>
+</section>
+
+<!-- ============================ P2 GAME PLAY ============================ -->
+<section class="page">
+  <h1 class="sec">Game Play</h1>
+  <p class="lead">You open your eyes on the cold tiles of the Recovery ward. The phone in your hand says <b>3:17 AM - No signal</b>. A fluorescent tube stutters overhead and paints the room red every few seconds. Beside you lie scattered papers, a battered flashlight and a plastic access card with only a number embossed so hard it almost cut through: <b>13</b>.</p>
+  <p>You thumb the flashlight on and the beam shows every flaw in the corridor: water-stained walls, a wheelchair left mid-turn, doors with narrow wired-glass windows. A yellow diamond on your HUD says the first objective is <b>57 m</b> away. In the security room, three CRT monitors show corridors you have not walked yet - and on one of them, thirty seconds from now, you are already standing there. Somewhere in the west wing a door opens by itself.</p>
+  <p>The Patient arrives without footsteps: a tall black silhouette with burning eyes and arms too long for his body. If you look at him he slows to a crawl; if you turn away he is closer. Your only rule is the one written in a child's handwriting on the Records room wall: <i>keep the light on him</i>. Back away with the beam on his face through the side door, sprint west with your lungs burning, curl into a laundry locker with the light off and your hand around a loose pipe while his breath moves along the metal door - then throw the pipe and slip out the other way.</p>
+  <p>The deeper you go, the less the building agrees with itself. The Patient file in the Records room lists your photograph, your admission time, and a note that you remember every attempt. Knocking comes three times from a door nobody is behind. And when you finally walk back down the main corridor, there is a new door next to the room where you woke up: <b>ROOM 13</b>.</p>
+  <div class="row3">
+    <figure class="short"><img src="02_recovery.jpg"><figcaption>Recovery ward - first minutes.</figcaption></figure>
+    <figure class="short"><img src="05_security_crt.jpg"><figcaption>Security room - CCTV that shows the future.</figcaption></figure>
+    <figure class="short"><img src="11_patient_red.jpg"><figcaption>The Patient in the emergency-lit corridor.</figcaption></figure>
+  </div>
+
+  <h2>Game Play Outline<small>This outline follows the template and varies by game type.</small></h2>
+  <ul style="columns:2;column-gap:10mm">
+    <li>Opening the game application</li><li>Game options</li><li>Story synopsis</li><li>Modes</li>
+    <li>Game elements</li><li>Game levels</li><li>Player's controls</li><li>Winning</li><li>Losing</li><li>End</li><li>Why is all this fun?</li>
+  </ul>
+
+</section>
+
+<!-- ============================ P3 OUTLINE (a) ============================ -->
+<section class="page">
+  <h1 class="sec">Game Play Outline</h1>
+
+  <h2>1. Opening the game application</h2>
+  <p>Double-click <b>ROOM13_Launcher.exe</b> (Play Fullscreen / Play Window / Watch Auto-Play) or run <b>Game\ROOM13.exe</b>, which opens fullscreen. The first screen is the <b>main menu</b>: a slow camera moves through a fogged hospital corridor behind the title <i>ROOM 13 - 03:17 AM</i> and the line "Headphones recommended. Play in the dark."</p>
+  <figure style="width:50%"><img src="01_menu.jpg"><figcaption>Main menu: <span class="kbd">ENTER</span> Begin · <span class="kbd">L</span> Language · <span class="kbd">Q</span> Quit.</figcaption></figure>
+
+  <h2>2. Game options</h2>
+  <ul>
+    <li><b>Language</b> - <span class="kbd">L</span> switches English / Arabic live (menu, HUD, hints, documents, credits).</li>
+    <li><b>Pause</b> - <span class="kbd">ESC</span>: Resume · Language · Quit to desktop.</li>
+    <li><b>Display</b> - <span class="kbd">F11</span> toggles fullscreen / window. Start-up flag <code>-windowed</code> is used by the launcher's Window mode.</li>
+    <li><b>Hint</b> - <span class="kbd">H</span> shows the current objective text; a persistent HUD marker also shows the direction and distance.</li>
+  </ul>
+
+  <h2>3. Story synopsis</h2>
+  <p>It is 03:17 AM. Patient 013 wakes on the floor of a hospital whose maintenance logs say <i>"The corridor has twelve rooms. The floor plan has twelve rooms. The fire map has twelve rooms. Stop filing reports about a thirteenth door."</i> A tall thing the staff call the Patient does not tolerate light and is only dangerous when unobserved. Previous patients are listed as <i>"Did not wake"</i>, <i>"Missing"</i> and <i>"Refused to turn off his torch. Battery failed at 03:52."</i>
+  Patient 013 is different: <b>he remembers every attempt</b>. He must collect a keycard, read his own file, survive the Patient in three set-piece encounters, and find the way out - even though the room that matters most is Room 13 itself.</p>
+
+  <h2>4. Modes</h2>
+  <table class="tbl">
+    <tr><th style="width:36mm">Mode</th><th>Description</th></tr>
+    <tr><td>Story (default)</td><td>Linear 11-stage campaign with automatic checkpoints. Death returns the player to the last checkpoint with the correct items and battery.</td></tr>
+    <tr><td>Window / Fullscreen</td><td>Chosen from the launcher or with F11.</td></tr>
+    <tr><td>Auto-Play (<code>-autotest</code>)</td><td>Built-in autopilot plays the entire game through the same player controls (~7 minutes real time). Used for QA, regression runs and demo capture.</td></tr>
+  </table>
+  <p class="tpl">No difficulty modes in v1.0 (see roadmap).</p>
+</section>
+
+<!-- ============================ P4 OUTLINE (b) ============================ -->
+<section class="page">
+  <h1 class="sec">Game Elements &amp; Levels</h1>
+  <h2>5. Game elements</h2>
+  <table class="tbl">
+    <tr><th style="width:34mm">Element</th><th>What it does</th></tr>
+    <tr><td>Flashlight</td><td>The only light source. 100 % battery drains ~0.33 % per second (about 5 minutes per cell). Flickers when low. <span class="kbd">F</span> toggles, <span class="kbd">R</span> swaps a spare cell.</td></tr>
+    <tr><td>The Patient</td><td>AI enemy. Cannot approach while lit, crawls when observed, hunts when the player is loud or unseen. See the Patient section.</td></tr>
+    <tr><td>Doors &amp; keycards</td><td>Doors with LED locks; the Pharmacy keycard opens the Records room; locked doors beep and warn.</td></tr>
+    <tr><td>Lockers</td><td>Hiding spots. Inside, the camera is locked to a narrow view, the light must be off, and the Patient may check them.</td></tr>
+    <tr><td>Throwable pipe</td><td>Thrown with <span class="kbd">G</span> / right-mouse. Makes noise where it lands and pulls the Patient toward it.</td></tr>
+    <tr><td>Phone &amp; map</td><td><span class="kbd">TAB</span>: clock, a note ("Find a way out."), and later the Room 13 notification.</td></tr>
+    <tr><td>Documents</td><td>Maintenance request #4471, patient files, staff notes: they deliver the story and teach the rules.</td></tr>
+    <tr><td>CCTV / CRT monitors</td><td>Show live feeds and set up scares (watching the monitor 30 s ahead).</td></tr>
+    <tr><td>Light fixtures</td><td>States On / Flicker / Off / Broken. The west-wing lights fail behind the player.</td></tr>
+  </table>
+
+  <h2>Core gameplay loop<small>What the player does, again and again, with rising pressure.</small></h2>
+  <div class="loop">
+    <div><b>LOOK</b>scan the dark; keep him in the beam</div><i>→</i>
+    <div><b>LISTEN</b>breath · knocks · doors · heartbeat</div><i>→</i>
+    <div><b>DECIDE</b>hide · run · throw · crouch</div><i>→</i>
+    <div><b>ACT</b>spend light, stamina and noise</div><i>→</i>
+    <div><b>ADVANCE</b>keycard · document · next door</div>
+  </div>
+  <figure class="mid" style="margin-top:4mm"><img src="04_corridor_hud.jpg"><figcaption>The main corridor: cold teal fog is safe, red emergency light means danger, the yellow diamond is the route.</figcaption></figure>
+
+</section>
+<section class="page">
+  <h1 class="sec">Game Levels</h1>
+  <h2 style="margin-top:0">6. Game levels (stages)</h2>
+  <p class="tpl">The hospital is one continuous map; the story director drives eleven stages inside it.</p>
+  <table class="tbl" style="font-size:8.6pt">
+    <tr><th style="width:6mm">#</th><th style="width:26mm">Stage</th><th>Where / what happens</th><th style="width:36mm">Objective on screen</th></tr>
+    <tr><td>1</td><td>Intro</td><td>Recovery ward. Pick up flashlight, phone, access card (13), papers.</td><td>Find a way out.</td></tr>
+    <tr><td>2</td><td>SecurityScare</td><td>End of the main corridor, east wing, Security room. CCTV monitors, footprints, a first scare.</td><td>Something opened in the west wing.</td></tr>
+    <tr><td>3</td><td>WestWing</td><td>West corridor: lights fail one by one behind you.</td><td>Find a way out of the west wing.</td></tr>
+    <tr><td>4</td><td>Keycard</td><td>Pharmacy (right of the west corridor): keycard on the table.</td><td>Find a keycard. The pharmacy?</td></tr>
+    <tr><td>5</td><td>Chase1Body</td><td>First Patient chase: light on him, back through the side door to Ward 3, then run west to the emergency exit.</td><td>RUN! Through the side door.</td></tr>
+    <tr><td>6</td><td>LaundrySequence</td><td>Hide in a laundry locker, light off, throw the pipe, leave by the lower corridor.</td><td>Hide. / Get out through the lower corridor.</td></tr>
+    <tr><td>7</td><td>Archive</td><td>Records room (keycard): the Patient 013 file.</td><td>The keycard. Find the RECORDS room.</td></tr>
+    <tr><td>8</td><td>Psych</td><td>Return through corridor B; monitors, three knocks, a door that opens after them.</td><td>Go back to the main corridor.</td></tr>
+    <tr><td>9</td><td>Room13</td><td>Room 13 appears next to where you woke. CRT shows the room.</td><td>ROOM 13</td></tr>
+    <tr><td>10</td><td>FinalChase</td><td>East wing, stairs to B3, tunnels, maintenance door; the Patient hunts. <b>Slide</b> under low pipes.</td><td>REACH THE EXIT.</td></tr>
+    <tr><td>11</td><td>Ending</td><td>Exit hall, the exit door, the street under red and blue light; credits.</td><td>You escaped the building.</td></tr>
+  </table>
+  <div class="row3">
+    <figure class="short"><img src="05_security_crt.jpg"><figcaption>SecurityScare - CCTV.</figcaption></figure>
+    <figure class="short"><img src="10_red_door.jpg"><figcaption>Psych / Room13 - the red door.</figcaption></figure>
+    <figure class="short"><img src="13_street.jpg"><figcaption>Ending - the street.</figcaption></figure>
+  </div>
+</section>
+
+<!-- ============================ P5 OUTLINE (c) ============================ -->
+<section class="page">
+  <h1 class="sec">Controls, Win, Lose, Fun</h1>
+
+  <h2>7. Player's controls</h2>
+  <p>Keyboard and mouse. The complete layout is in the User Interface section.</p>
+  <table class="tbl">
+    <tr><th>Move / look</th><th>Act</th><th>Light &amp; items</th></tr>
+    <tr>
+      <td style="font-weight:400"><span class="kbd">W</span><span class="kbd">A</span><span class="kbd">S</span><span class="kbd">D</span> move<br><span class="kbd">Mouse</span> look<br><span class="kbd">Shift</span> sprint<br><span class="kbd">C</span> / <span class="kbd">Ctrl</span> crouch; slide while sprinting (final stage)</td>
+      <td style="font-weight:400"><span class="kbd">E</span> interact / open / hide / leave locker<br><span class="kbd">G</span> / <span class="kbd">RMB</span> throw<br><span class="kbd">H</span> hint<br><span class="kbd">Esc</span> pause</td>
+      <td style="font-weight:400"><span class="kbd">F</span> flashlight<br><span class="kbd">R</span> change battery<br><span class="kbd">Tab</span> phone / map<br><span class="kbd">F11</span> window / fullscreen</td>
+    </tr>
+  </table>
+
+  <h2>8. Winning</h2>
+  <p>Reach the <b>exit door</b> at the end of the maintenance tunnels while the Patient is hunting you, and step out into the street. The game then rolls the credits and ends with <i>"No patients were discharged."</i></p>
+  <h2>9. Losing</h2>
+  <p>You lose when the Patient gets within about <b>1.15 m</b> of you while he is able to kill. The screen cuts to a short death state and you restart from the last <b>checkpoint</b> (position, items, battery and spares are restored) with an attempt counter that the ending acknowledges. There are no health bars: one mistake is fatal, and that is what makes every decision count.</p>
+  <h2>10. End</h2>
+  <p>The street outside glows with red and blue light; the phone buzzes: <i>"ROOM 13 - OCCUPIED"</i>. The last caption says <i>"Not the room."</i> The player escaped the building, but the credits make clear the story did not end. The game returns to the main menu.</p>
+  <h2>11. Why is all this fun?</h2>
+  <ul>
+    <li><b>Light is the weapon and the clock.</b> Every second the beam is on the Patient is a second you are safe - and a second of battery you will not get back.</li>
+    <li><b>Rules you can learn, not scripts you can memorise.</b> The documents teach the rules one scrap at a time, then each encounter asks you to use them under pressure.</li>
+    <li><b>A short, intense arc.</b> Eleven stages, no filler: scare → relief → clue → chase → hide → reveal → run.</li>
+    <li><b>Bilingual and personal.</b> Full Arabic support with correct text shaping; the story is built around the player's own repeated attempts.</li>
+  </ul>
+  <div class="row2" style="margin-top:3mm">
+    <figure class="short"><img src="06_chase_run.jpg"><figcaption>"RUN!" - red emergency light, first chase.</figcaption></figure>
+    <figure class="short"><img src="07_locker.jpg"><figcaption>Locker hide - light off, hand on the pipe.</figcaption></figure>
+  </div>
+</section>
+
+<!-- ============================ P6 KEY FEATURES / DESIGN DOC ============================ -->
+<section class="page">
+  <h1 class="sec">Key Features</h1>
+  <p class="tpl">List of game elements attractive to the player.</p>
+  <div class="two">
+    <ul>
+      <li><b>The Patient AI</b> - a state machine (Patrol, Investigate, Search, Chase, Hunt, Leaving) that reacts to light, noise, line of sight and being watched.</li>
+      <li><b>Light as a mechanic</b> - lit/observed rules, battery, flicker, spare cells.</li>
+      <li><b>Stealth &amp; noise model</b> - sprint, walk, crouch, doors, throws and the flashlight all emit noise events.</li>
+      <li><b>Hiding &amp; distraction</b> - lockers and a throwable pipe.</li>
+    </ul>
+    <ul>
+      <li><b>100 % procedural content</b> - level geometry, textures, props and audio are generated in code; the full game is a ~58 MB download.</li>
+      <li><b>Live-synthesised audio</b> - breaths, heartbeat, rusty iron doors, drone, chase music; reacts to tension.</li>
+      <li><b>English / Arabic</b> with right-to-left text shaping.</li>
+      <li><b>Always-visible guidance</b> - objective text, distance marker and edge arrows so the player never loses the route.</li>
+    </ul>
+  </div>
+
+  <h1 class="sec" style="margin-top:7mm">Design Document</h1>
+  <p>This section describes how the game objects behave, how they are controlled and what their properties are - the "mechanics". It is modular: further documents (levels, audio, narrative) can be attached to the concept document.</p>
+
+  <h2>Design Guidelines<small>Creative restrictions and the overall goal of the design.</small></h2>
+  <ul>
+    <li><b>Goal:</b> a tight, scary 10-minute experience a stranger can finish in one sitting.</li>
+    <li><b>No combat.</b> The player cannot hurt the Patient; light only holds him back.</li>
+    <li><b>Darkness is the art direction.</b> Low-key lighting, red emergency light as the danger colour, teal fog as the safe colour.</li>
+    <li><b>Never lost, never safe.</b> The route is always indicated; the threat is the only thing that is uncertain.</li>
+    <li><b>Small footprint.</b> Everything generated at runtime, so the build is small and easy to share.</li>
+    <li><b>Accessible language.</b> English and Arabic are equal citizens in the UI.</li>
+  </ul>
+
+  <h2>Game Design Definitions<small>How a player wins, loses, transitions between levels, and the main focus of gameplay.</small></h2>
+  <table class="tbl">
+    <tr><td style="width:34mm">Win</td><td>Leave the building through the exit door (stage 11).</td></tr>
+    <tr><td>Lose</td><td>Caught by the Patient (distance &lt; ~1.15 m while he can kill) → death state → restart from checkpoint.</td></tr>
+    <tr><td>Transition</td><td>Story triggers (entering a zone, picking an item, finishing a hide) advance the stage; checkpoints store position, yaw, items, battery and spares.</td></tr>
+    <tr><td>Main focus</td><td>Managing light and attention: when to look, when to run, when to hide.</td></tr>
+  </table>
+</section>
+
+<!-- ============================ P7 RULES ============================ -->
+<section class="page">
+  <h1 class="sec">Game Design Definitions - Rules</h1>
+
+  <h2>Light &amp; observation</h2>
+  <table class="tbl">
+    <tr><th style="width:38mm">Rule</th><th>Behaviour</th></tr>
+    <tr><td>Lit</td><td>If the Patient is inside the flashlight cone he cannot approach and may flinch or retreat.</td></tr>
+    <tr><td>Observed</td><td>If the player is looking at him (line of sight inside the view cone) he is slowed to <b>1.3 m/s</b>. Look away and he moves at his state speed.</td></tr>
+    <tr><td>Battery</td><td>100 % → 0 at 0.33 %/s. At low charge the flashlight flickers; at 0 the light dies (the HUD "LIGHT" text turns red at ~10 %). A spare cell (<span class="kbd">R</span>) restores it; the HUD shows "+N" spares.</td></tr>
+    <tr><td>Beam strength</td><td>Spot light with ~520 lumens base intensity, with random and scripted flicker.</td></tr>
+  </table>
+
+  <h2>Stealth &amp; noise</h2>
+  <table class="tbl">
+    <tr><th style="width:38mm">Source</th><th>Noise radius</th></tr>
+    <tr><td>Sprint step</td><td>16 m</td></tr>
+    <tr><td>Walk step</td><td>4.5 m</td></tr>
+    <tr><td>Crouch step</td><td>0 (silent)</td></tr>
+    <tr><td>Door, thrown object, object impact, flashlight toggle, scripted</td><td>Emit noise events of their own kind that the Patient can investigate.</td></tr>
+  </table>
+
+  <h2>Movement &amp; stamina</h2>
+  <table class="tbl">
+    <tr><th style="width:38mm">Property</th><th>Value</th></tr>
+    <tr><td>Walk / Sprint / Crouch</td><td>2.1 / 5.7 / 1.1 m/s</td></tr>
+    <tr><td>Stamina</td><td>7.5 s of sprint. Regenerates at 1.3 /s standing still and 0.75 /s while moving. At 0 the player is locked out of sprinting until stamina recovers to 35 %; a panting breath plays.</td></tr>
+    <tr><td>Collider height</td><td>1.75 m standing, 1.05 m crouched. Crouching under low pipes is required in the tunnels.</td></tr>
+    <tr><td>Slide (final stage)</td><td>While sprinting, press <span class="kbd">C</span> or <span class="kbd">Ctrl</span>: a 0.9 s burst (1.45× sprint speed fading to 0.5×) with the body lowered; the player cannot stand while the slide lasts, and stays crouched afterwards if there is a low obstacle overhead. 0.7 s cooldown.</td></tr>
+  </table>
+
+  <h2>Hiding &amp; doors</h2>
+  <ul>
+    <li><b>Locker:</b> <span class="kbd">E</span> to enter/leave. The player must switch the light off (<span class="kbd">F</span>) and stay quiet; the Patient may search lockers he saw the player enter.</li>
+    <li><b>Doors:</b> open, creak, can be slammed and can be broken by the Patient. A locked door beeps (deny) and shows a message; with the right keycard it beeps (ok) and unlocks.</li>
+  </ul>
+</section>
+
+<!-- ============================ P8 FLOWCHART ============================ -->
+<section class="page">
+  <h1 class="sec">Game Flowchart</h1>
+  <p class="tpl">Menu · Synopsis · Game Play · Player Control · Game Over (Winning and Losing)</p>
+  <svg id="flow" viewBox="0 0 680 840" width="100%" style="margin-top:1mm"></svg>
+</section>
+
+<!-- ============================ P9 PLAYER ============================ -->
+<section class="page">
+  <h1 class="sec">Player Definition</h1>
+  <ul>
+    <li>Quick description: <b>Patient 013</b> - an anonymous patient with a flashlight, a phone with 11 % battery and a keycard with the number 13.</li>
+    <li>Player Properties define what changes during play and what feedback the change produces.</li>
+    <li>Player Rewards are the objects that help the player.</li>
+  </ul>
+
+  <h2>Player Definitions</h2>
+  <table class="tbl">
+    <tr><th style="width:32mm">Aspect</th><th>Definition</th></tr>
+    <tr><td>Health</td><td>None. The player is either alive or caught. Safety comes from distance, light and hiding.</td></tr>
+    <tr><td>Weapons</td><td>None. Defensive tools: flashlight (holds the Patient back) and a throwable pipe (distraction).</td></tr>
+    <tr><td>Actions</td><td>Walk, sprint, crouch, slide (final stage), look, interact, hide, throw, toggle light, change battery, read documents, use phone / map, request hint, pause.</td></tr>
+  </table>
+
+  <h2>Player Properties<small>Each property gives feedback when it changes.</small></h2>
+  <table class="tbl">
+    <tr><th style="width:30mm">Property</th><th>Range</th><th>Feedback</th></tr>
+    <tr><td>Stamina</td><td>0 - 7.5 s</td><td>Thin bar at the bottom of the screen; panting breath when exhausted; sprint locked until 35 %.</td></tr>
+    <tr><td>Battery</td><td>0 - 100 %</td><td>"LIGHT 69 % +2" at the bottom right; flicker below ~20 %; red text at ~10 %; dark screen when empty.</td></tr>
+    <tr><td>Spare cells</td><td>0 - n</td><td>"+N" next to the light value; "change battery" prompt with an animation.</td></tr>
+    <tr><td>Noise</td><td>0 - 16 m</td><td>Footstep loudness and the Patient's reaction; crouching is silent.</td></tr>
+    <tr><td>Posture</td><td>Stand / crouch / slide / hidden</td><td>Camera height changes, speed changes, locker view when hidden.</td></tr>
+    <tr><td>Fear (Tension)</td><td>0 - 1</td><td>Heartbeat speed and volume, breathing, drone pitch, chase music layer, vignette and chromatic aberration, camera shake.</td></tr>
+    <tr><td>Attempts</td><td>1 - n</td><td>Remembered by the story: the ending line counts the attempts.</td></tr>
+  </table>
+
+  <h2>Player Rewards<small>Power-ups and pick-ups.</small></h2>
+  <table class="tbl">
+    <tr><th style="width:30mm">Item</th><th>Where</th><th>Effect</th></tr>
+    <tr><td>Flashlight</td><td>Recovery floor</td><td>Unlocks light; <span class="kbd">F</span> toggles.</td></tr>
+    <tr><td>Phone</td><td>Recovery floor</td><td>Clock, notes, map (<span class="kbd">Tab</span>).</td></tr>
+    <tr><td>Access card 13</td><td>Recovery floor</td><td>Story item; later explains Room 13.</td></tr>
+    <tr><td>Keycard</td><td>Pharmacy table</td><td>Opens the Records room.</td></tr>
+    <tr><td>Battery cells</td><td>Storage, Pharmacy, hospital floor</td><td>+100 % light when swapped.</td></tr>
+    <tr><td>Loose pipe</td><td>Laundry locker</td><td>Throw to distract (<span class="kbd">G</span>).</td></tr>
+    <tr><td>Documents</td><td>Throughout</td><td>Lore and hints (Maintenance request #4471, Patient 013 file).</td></tr>
+  </table>
+</section>
+
+<!-- ============================ P10 PATIENT ============================ -->
+<section class="page">
+  <h1 class="sec">The Patient (Enemy Definition)</h1>
+  <div class="two" style="grid-template-columns:1.2fr 1fr;align-items:start">
+    <div>
+      <p><i>"A tall black figure with burning eyes. Very long arms. Head bent sideways. HE ONLY MOVES WHEN YOU DONT LOOK. KEEP THE LIGHT ON HIM."</i> - child's drawing in the Records room.</p>
+      <p>He is a single AI agent that uses a navigation graph of the hospital and a perception model: sight range <b>13 m</b>, line of sight, noise events, and "is lit / is observed" flags. He opens doors (and waits at locked ones), checks lockers he saw the player enter, and breathes in 3D so the player can hear him before seeing him.</p>
+    </div>
+    <figure><img src="11_patient_red.jpg"><figcaption>Patient in emergency light.</figcaption></figure>
+  </div>
+  <h2>State machine</h2>
+  <table class="tbl">
+    <tr><th style="width:26mm">State</th><th style="width:24mm">Speed</th><th>Behaviour</th></tr>
+    <tr><td>Inactive</td><td>-</td><td>Not in the world (story pauses him).</td></tr>
+    <tr><td>Scripted</td><td>cinematic</td><td>Under the story director's control (jump-scares, monitors).</td></tr>
+    <tr><td>Patrol</td><td>1.25 m/s</td><td>Walks through patrol areas; looks around.</td></tr>
+    <tr><td>Investigate</td><td>2.1 m/s</td><td>Heard a noise: goes to the source and stops.</td></tr>
+    <tr><td>Search</td><td>2.1 m/s</td><td>Lost the player: searches near the last known position and checks lockers.</td></tr>
+    <tr><td>Chase</td><td>5.3 m/s</td><td>Sees the player. Slower than the player's sprint (5.7 m/s) so a clean run can outpace him.</td></tr>
+    <tr><td>Hunt</td><td>6.1 m/s</td><td>Always knows where the player is (final chase). Faster than sprint - the player must use the slide and the route.</td></tr>
+    <tr><td>Leaving</td><td>-</td><td>Withdraws when lit or when the scene ends.</td></tr>
+  </table>
+  <p><b>Observed</b> overrides speed to 1.3 m/s while the player looks at him. <b>Lit</b> prevents approach. Kill distance 1.15 m.</p>
+  <figure class="mid"><img src="10_red_door.jpg"><figcaption>He appears in doorways lit red - never in the beam.</figcaption></figure>
+</section>
+
+<!-- ============================ P11 UI ============================ -->
+<section class="page">
+  <h1 class="sec">User Interface (UI)</h1>
+  <p>Keyboard + mouse. Keys are grouped by hand position: left hand moves and acts, right hand looks. The worst layout (a laptop without numpad) still works because no key is outside the main block.</p>
+  <svg id="kb" viewBox="0 0 680 270" width="100%"></svg>
+
+  <h2>HUD<small>Always minimal: the world is the interface.</small></h2>
+  <div style="position:relative;width:78%;margin:0 auto">
+    <img src="04_corridor_hud.jpg" style="width:100%;display:block;border:1px solid #cfd5d6">
+    <style>.pin{position:absolute;width:6.2mm;height:6.2mm;border-radius:50%;background:var(--blood);color:#fff;font:700 8.6pt/6.2mm "Segoe UI";text-align:center;box-shadow:0 0 0 1.2mm rgba(255,255,255,.75)}</style>
+    <span class="pin" style="left:92%;top:2%">1</span>
+    <span class="pin" style="left:53.5%;top:66%">2</span>
+    <span class="pin" style="left:90%;top:90%">3</span>
+    <span class="pin" style="left:2%;top:2%">4</span>
+  </div>
+  <table class="tbl">
+    <tr><td style="width:8mm">1</td><td>Objective text (top-right) - now persistent; localised.</td></tr>
+    <tr><td>2</td><td>Waypoint diamond + distance in metres; becomes an <b>edge arrow</b> pointing at the target when it is off-screen or behind you. Enlarged in v1.0 so it can never be missed.</td></tr>
+    <tr><td>3</td><td>Light level and spare cells ("LIGHT 69 % +2").</td></tr>
+    <tr><td>4</td><td>Context prompts: "[E] Open", "[E] Leave", "change battery", pick-up names.</td></tr>
+  </table>
+  <h2>Menus &amp; feedback</h2>
+  <ul>
+    <li><b>Main menu</b> (<span class="kbd">ENTER</span> / <span class="kbd">L</span> / <span class="kbd">Q</span>), <b>pause</b> (<span class="kbd">ESC</span>), <b>phone</b> (<span class="kbd">TAB</span>), <b>document reader</b> ([E] Close).</li>
+    <li><b>Red vignette + "RUN!"</b> in chases; <b>subtitles</b> for story lines ("3:17 AM. No signal.", "Don't look behind you."); screen-edge arrows; stamina bar.</li>
+    <li>Arabic uses full right-to-left layout and letter shaping with a fall-back that keeps Latin words and numbers readable.</li>
+  </ul>
+</section>
+
+<!-- ============================ P12 WORLD / NARRATIVE ============================ -->
+<section class="page">
+  <h1 class="sec">World, Narrative &amp; Audio</h1>
+  <h2>The hospital (areas)</h2>
+  <p>RECOVERY · main CORRIDOR · EAST WING · SECURITY · STORAGE · ARCHIVE / RECORDS · WEST WING · PHARMACY · WARD 3 · LAUNDRY (N and S) · lower corridor · STAIRS to B3 · TUNNELS · MAINTENANCE · EXIT HALL · STREET. One continuous map, built from data at start-up by the level builder (rooms, doors, props, lights, decals, nav nodes).</p>
+  <div class="row3">
+    <figure><img src="04_corridor_hud.jpg"><figcaption>Main corridor.</figcaption></figure>
+    <figure><img src="09_room13_crt.jpg"><figcaption>Room 13 monitor.</figcaption></figure>
+    <figure><img src="13_street.jpg"><figcaption>The street.</figcaption></figure>
+  </div>
+
+  <h2>Narrative documents</h2>
+  <table class="tbl">
+    <tr><th style="width:44mm">Document</th><th>Role</th></tr>
+    <tr><td>A plastic access card</td><td>"White plastic, scratched. No name. No photo. Only a number, embossed so hard it almost cut through: 13."</td></tr>
+    <tr><td>Maintenance request #4471</td><td>Warns about the west wing circuit: "If the lights start going out behind you one by one, do NOT keep walking."</td></tr>
+    <tr><td>Staff notes</td><td>"02:50 Patient in 13 asked what day it was... He said: No. Tomorrow." "03:16 Someone knocking. Three times."</td></tr>
+    <tr><td>Patient file 013</td><td>Admitted 03:17. Room 13. "Wakes on the floor of Recovery. Asks for the way out. Finds the room. Patient 013 remembers every attempt."</td></tr>
+    <tr><td>Child's drawing</td><td>The tall figure; "HE ONLY MOVES WHEN YOU DONT LOOK" - "KEEP THE LIGHT ON HIM".</td></tr>
+  </table>
+
+  <h2>Audio (procedural)</h2>
+  <ul>
+    <li>All sound is synthesised at runtime and cached as AudioClips: breath (calm and fast "fear breath"), heartbeat (soft and hard), footsteps, wet steps, drones, alarms, CRT hum, knocks, whispers and the patient's breath / skitter / hiss.</li>
+    <li><b>v1.0 additions:</b> old rusty <b>iron-door</b> sounds (latch click, hinge squeal, heavy clang, slam, locked handle rattle) and a slide scrape.</li>
+    <li>Tension drives the mix: breathing and heartbeat rise, the drone pitches up, chase and tension music layers cross-fade; the player's own breathing is deliberately quiet so the Patient's is heard.</li>
+  </ul>
+</section>
+
+<!-- ============================ P13 TECH / QA / ROADMAP ============================ -->
+<section class="page">
+  <h1 class="sec">Technology, QA &amp; Roadmap</h1>
+  <h2>Technology</h2>
+  <table class="tbl">
+    <tr><th style="width:40mm">Area</th><th>Notes</th></tr>
+    <tr><td>Engine</td><td>Unity 6 (6000.x), HDRP, Mono, legacy Input.</td></tr>
+    <tr><td>Architecture</td><td>Bootstrap creates Audio, UI, PostFX, Level and Player; <b>StoryDirector</b> runs the stage coroutines and checkpoints; <b>PatientAI</b> + <b>PatientBody</b>; <b>NavGraph</b> for pathing; <b>NoiseSystem</b> for hearing; <b>LightManager / LightFixture</b> for power states; <b>GameUI</b> builds all UI in code.</td></tr>
+    <tr><td>Procedural content</td><td><b>LevelBuilder</b> (areas, doors, props, nav), <b>TexGen</b> / <b>MaterialLib</b> (textures), <b>HorrorSynth</b> / <b>SynthAudio</b> (sound).</td></tr>
+    <tr><td>Build size</td><td>~181 MB unpacked, ~58 MB zip.</td></tr>
+    <tr><td>Distribution</td><td>itch.io, Windows. Zip root: README, <code>ROOM13_Launcher.exe</code>, <code>Game/</code>, <code>.itch.toml</code>. The executable is not code-signed (SmartScreen may warn).</td></tr>
+  </table>
+
+  <h2>Quality assurance</h2>
+  <ul>
+    <li><b>Autopilot regression:</b> <code>-autotest</code> plays all 11 stages through the real player controls; the final build reached the Ending stage in ~410 s on every run with <b>0 exceptions</b> in the player log.</li>
+    <li>Launcher smoke test from a clean unzip: game starts, responds, no errors.</li>
+    <li>Slide mechanic verified through the player log (start/end events); a human play-test of the final chase is still pending.</li>
+  </ul>
+
+  <h2>Known limitations</h2>
+  <ul>
+    <li>No in-game settings menu (volume, sensitivity, key rebinding).</li>
+    <li>Single ending; no difficulty setting; keyboard and mouse only.</li>
+    <li>Darkness is intentional but may be hard on some monitors - a brightness option is planned.</li>
+  </ul>
+
+  <h2>Roadmap</h2>
+  <table class="tbl">
+    <tr><th style="width:26mm">Version</th><th>Planned</th></tr>
+    <tr><td>1.1</td><td>Settings (volume, sensitivity, brightness), gamepad support, more slide / vault set-pieces, accessibility subtitles.</td></tr>
+    <tr><td>1.2</td><td>Second ending, difficulty modes, speed-run timer and attempt statistics.</td></tr>
+    <tr><td>2.0</td><td>Extended hospital (new wings), new Patient behaviours, Steam page.</td></tr>
+  </table>
+  <div class="callout"><b>Credits.</b> Design, code, procedural audio and level: <b>Eng. Faisal</b> (المهندس فيصل). Built with Unity 6 - HDRP.</div>
+</section>
+
+<!-- ============================ P14 ARABIC ============================ -->
+<section class="page rtl">
+  <h1 class="sec">ملخص وثيقة تصميم اللعبة (GDD)</h1>
+  <h2>اسم اللعبة: الغرفة 13 (ROOM 13)</h2>
+  <p><b>النوع:</b> رعب نفسي من منظور الشخص الأول، يعتمد على التخفّي والبقاء. لاعب واحد، قصة خطية مدتها نحو 7 دقائق.</p>
+  <p><b>الفكرة:</b> أنت المريض 013، تستيقظ في الساعة 3:17 فجرًا في مستشفى مهجور له اثنتا عشرة غرفة وباب ثالث عشر لا ينبغي أن يوجد. كائن طويل أسود لا يتحرك إلا حين لا تنظر إليه، ولا يقترب من الضوء. قاعدتك الوحيدة: <b>أبقِ الضوء عليه</b> واهرب.</p>
+  <h2>العناصر الأساسية</h2>
+  <ul>
+    <li>الكشاف ببطارية تنفد (حوالي 5 دقائق للخلية) وبطاريات احتياطية.</li>
+    <li>التخفّي: الركض يُصدر ضجيجًا بنصف قطر 16 م، والمشي 4.5 م، والانحناء بلا صوت.</li>
+    <li>الاختباء في الخزائن مع إطفاء الضوء، ورمي الأنبوب لتشتيت الكائن.</li>
+    <li>بطاقة المفتاح، الأبواب المقفلة، شاشات المراقبة، الأوراق والهاتف/الخريطة.</li>
+    <li>الانزلاق تحت العوائق أثناء الركض في المطاردة الأخيرة (أثناء الجري اضغط C أو Ctrl).</li>
+  </ul>
+  <h2>المراحل (11)</h2>
+  <p>غرفة الإنعاش ← غرفة الأمن ← الجناح الغربي ← الصيدلية (بطاقة المفتاح) ← المطاردة الأولى ← المغسلة (اختباء) ← غرفة السجلات ← الجزء النفسي ← ظهور الغرفة 13 ← المطاردة الأخيرة (الأنفاق وباب الصيانة) ← الشارع والخاتمة.</p>
+  <h2>الفوز والخسارة</h2>
+  <ul>
+    <li><b>الفوز:</b> الوصول إلى باب الخروج والخروج إلى الشارع.</li>
+    <li><b>الخسارة:</b> إذا اقترب الكائن أقل من نحو 1.15 م، فتعود من آخر نقطة حفظ بعتادك وبطاريتك.</li>
+  </ul>
+  <h2>التحكم</h2>
+  <p>W A S D حركة · الماوس نظر · Shift ركض · C أو Ctrl انحناء/انزلاق · E تفاعل · F الكشاف · R تبديل البطارية · G أو زر الفأرة الأيمن رمي · Tab الهاتف/الخريطة · H تلميح · L اللغة (في القائمة) · Esc إيقاف مؤقت · F11 نافذة/ملء الشاشة.</p>
+  <h2>التقنية</h2>
+  <p>Unity 6 (HDRP) ولغة C#، ويعمل على Windows 10/11 مع DirectX 12. كل شيء (المراحل والمجسمات والنسيج والصوت) يُولَّد بالكود عند التشغيل، فحجم التنزيل نحو 58 ميغابايت فقط. اللغتان العربية والإنجليزية مدعومتان بالكامل مع تشكيل الحروف والاتجاه من اليمين لليسار.</p>
+  <h2>الجودة</h2>
+  <p>اللاعب الآلي الداخلي (<code dir="ltr">-autotest</code>) يلعب المراحل الإحدى عشرة كاملة في نحو 410 ثانية بدون أي أخطاء في سجل اللعبة.</p>
+  <p style="margin-top:6mm;color:#6b7478">التصميم والبرمجة والصوت والمراحل: <b>المهندس فيصل</b></p>
+</section>
+
+<script>
+/* ---------- keyboard diagram ---------- */
+(function(){
+  const NS="http://www.w3.org/2000/svg", svg=document.getElementById('kb');
+  const el=(n,a,t)=>{const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);if(t!==undefined)e.textContent=t;svg.appendChild(e);return e};
+  const key=(x,y,w,h,label,color,sub)=>{
+    el('rect',{x,y,width:w,height:h,rx:6,fill:color||'#fff',stroke:'#7b858a','stroke-width':1.3});
+    el('rect',{x:x+2,y:y+h-5,width:w-4,height:3,rx:1.5,fill:'rgba(0,0,0,.12)'});
+    el('text',{x:x+w/2,y:y+h/2+(sub?-2:5),'text-anchor':'middle','font-size':sub?13:15,'font-weight':700,fill:'#14181a'},label);
+    if(sub) el('text',{x:x+w/2,y:y+h/2+12,'text-anchor':'middle','font-size':8.4,fill:'#3a4448'},sub);
+  };
+  const U=44,G=5;
+  // left block (movement)
+  const mv='#e1efed', act='#f8e3e6', lt='#fff1c9';
+  el('text',{x:10,y:16,'font-size':11,'font-weight':700,fill:'#6b7478','letter-spacing':1.5},'LEFT HAND');
+  key(10+U+G+22,26,U,U,'W',mv,'forward'); key(10+22,26+U+G,U,U,'A',mv,'left'); key(10+22+U+G,26+U+G,U,U,'S',mv,'back'); key(10+22+2*(U+G),26+U+G,U,U,'D',mv,'right');
+  key(10+22+3*(U+G),26,U,U,'R',lt,'battery'); key(10+22+3*(U+G),26+U+G,U,U,'F',lt,'light');
+  key(10+22+4*(U+G),26,U,U,'E',act,'interact'); key(10+22+4*(U+G),26+U+G,U,U,'G',act,'throw');
+  key(10,26+2*(U+G),2*U,U-6,'Shift',mv,'sprint'); key(10+2*U+G,26+2*(U+G),U+10,U-6,'C',mv,'crouch / slide'); key(10+3*U+G+15,26+2*(U+G),2*U-10,U-6,'Ctrl',mv,'crouch / slide');
+  key(10,26+3*(U+G)+6,3*U,U-8,'Tab',lt,'phone / map'); key(10+3*U+G,26+3*(U+G)+6,U,U-8,'H',lt,'hint');
+  key(10+4*U+2*G,26+3*(U+G)+6,U,U-8,'L',act,'language');
+  // right: mouse + system
+  el('text',{x:400,y:16,'font-size':11,'font-weight':700,fill:'#6b7478','letter-spacing':1.5},'RIGHT HAND / SYSTEM');
+  // mouse
+  el('rect',{x:410,y:28,width:80,height:118,rx:38,fill:'#fff',stroke:'#7b858a','stroke-width':1.3});
+  el('line',{x1:450,y1:28,x2:450,y2:80,stroke:'#7b858a','stroke-width':1.3}); el('line',{x1:410,y1:80,x2:490,y2:80,stroke:'#7b858a','stroke-width':1.3});
+  el('rect',{x:451,y:29,width:38,height:50,rx:20,fill:'#f8e3e6'});
+  el('text',{x:450,y:112,'text-anchor':'middle','font-size':11,'font-weight':700,fill:'#14181a'},'Mouse');
+  el('text',{x:450,y:126,'text-anchor':'middle','font-size':9,fill:'#3a4448'},'look around');
+  el('text',{x:470,y:60,'text-anchor':'middle','font-size':8.6,fill:'#7d0b17','font-weight':700},'RMB');
+  el('text',{x:470,y:71,'text-anchor':'middle','font-size':8,fill:'#7d0b17'},'throw');
+  key(520,28,70,40,'Esc','#fff','pause'); key(596,28,70,40,'F11','#fff','window');
+  key(520,76,70,40,'Enter','#fff','begin'); key(596,76,70,40,'Q','#fff','quit (menu)');
+  // legend
+  const lg=[['#e1efed','Move / posture'],['#f8e3e6','Act'],['#fff1c9','Light / items / info']];
+  lg.forEach((l,i)=>{el('rect',{x:410+i*90,y:170,width:14,height:14,rx:3,fill:l[0],stroke:'#7b858a'});el('text',{x:430+i*90,y:182,'font-size':9,fill:'#3a4448'},l[1]);});
+  el('text',{x:10,y:262,'font-size':9,fill:'#6b7478'},'Slide: hold Shift + W, then press C or Ctrl in the final stage (FinalChase).');
+})();
+
+/* ---------- flowchart ---------- */
+(function(){
+  const NS="http://www.w3.org/2000/svg", svg=document.getElementById('flow');
+  const E=(n,a,t,p)=>{const e=document.createElementNS(NS,n);for(const k in a)e.setAttribute(k,a[k]);if(t!==undefined)e.textContent=t;(p||svg).appendChild(e);return e};
+  const defs=E('defs',{}); const mk=(id,c)=>{const m=E('marker',{id,viewBox:'0 0 10 10',refX:9,refY:5,markerWidth:7,markerHeight:7,orient:'auto-start-reverse'},undefined,defs);E('path',{d:'M0,0 L10,5 L0,10 z',fill:c},undefined,m)};
+  mk('ar','#3a4448'); mk('ab','#b0102a'); mk('ag','#1f5a55'); mk('ay','#8a6b00');
+  const box=(x,y,w,h,title,sub,fill,stroke,light)=>{E('rect',{x,y,width:w,height:h,rx:9,fill:fill||'#fff',stroke:stroke||'#3a4448','stroke-width':1.6});
+    const s=sub?(Array.isArray(sub)?sub:[sub]):[]; const n=s.length;
+    E('text',{x:x+w/2,y:y+(n?h/2-4-(n-1)*6:h/2+5),'text-anchor':'middle','font-size':13,'font-weight':700,fill:light?'#fff':'#14181a'},title);
+    s.forEach((t,i)=>E('text',{x:x+w/2,y:y+h/2+10+i*12-(n-1)*6,'text-anchor':'middle','font-size':10.2,fill:light?'#e9e4da':'#4a5559'},t));};
+  const line=(x1,y1,x2,y2,c,dash,id)=>E('line',{x1,y1,x2,y2,stroke:c||'#3a4448','stroke-width':1.8,'marker-end':'url(#'+(id||'ar')+')','stroke-dasharray':dash||''});
+  const path=(d,c,dash,id)=>E('path',{d,fill:'none',stroke:c||'#3a4448','stroke-width':1.8,'marker-end':'url(#'+(id||'ar')+')','stroke-dasharray':dash||''});
+  const dark='#101517', red='#b0102a', teal='#1f5a55';
+  E('text',{x:6,y:12,'font-size':10.5,'font-weight':700,fill:'#6b7478','letter-spacing':1.6},'MAIN FLOW');
+  box(230,20,220,44,'Launcher / ROOM13.exe','fullscreen or window',dark,dark,true);
+  line(340,64,340,86);
+  box(230,86,220,52,'MENU','ENTER Begin  ·  L Language  ·  Q Quit','#fff',dark);
+  line(340,138,340,160);
+  box(230,160,220,52,'SYNOPSIS','03:17 AM - Patient 013 wakes · "Find a way out."','#fff',dark);
+  line(340,212,340,234);
+  E('rect',{x:146,y:234,width:388,height:440,rx:14,fill:'#f3f5f5',stroke:teal,'stroke-width':1.8,'stroke-dasharray':'7 5'});
+  E('text',{x:160,y:254,'font-size':11.5,'font-weight':700,fill:teal,'letter-spacing':1.4},'GAME PLAY - 11 STAGES');
+  const st=[['1  Intro','Recovery: flashlight · phone · card'],['2  SecurityScare','CCTV monitors · first scare'],['3  WestWing  +  4  Keycard','lights fail · Pharmacy keycard'],['5  Chase1Body','light on him · side door · run west'],['6  LaundrySequence','hide · light off · throw the pipe'],['7  Archive  +  8  Psych','Patient file · knocks · monitors'],['9  Room13  →  10  FinalChase','Room 13 appears · tunnels · SLIDE']];
+  let y=266; st.forEach((s,i)=>{box(176,y,328,44,s[0],s[1],'#fff',teal);if(i<st.length-1)line(340,y+44,340,y+58,teal,null,'ag');y+=58;});
+  box(2,332,136,100,'PLAYER CONTROL',['WASD · Shift · C / Ctrl','E · F · R · G · Tab · H','slide in the final stage'],'#fff7da','#8a6b00');
+  path('M138,382 L176,382','#8a6b00','4 3','ay');
+  box(552,300,124,86,'THE PATIENT',['AI: patrol → chase → hunt','light holds · looking slows'],dark,dark,true);
+  path('M552,343 L504,343',red,'4 3','ab');
+  line(340,674,340,700);
+  box(190,700,300,46,'ENDING','exit door → street → credits','#fff',dark);
+  box(70,774,200,46,'GAME OVER - WIN','"No patients were discharged."',dark,dark,true);
+  box(410,774,200,46,'MENU','return to the main menu','#fff',dark);
+  path('M290,746 L190,774'); path('M390,746 L490,774');
+  box(552,430,124,70,'CAUGHT','Patient < 1.15 m',red,red,true);
+  box(552,540,124,70,'CHECKPOINT','items · battery · position','#fff',red);
+  path('M614,500 L614,540',red,null,'ab');
+  path('M552,575 L520,575 L520,300 L504,300',red,'5 3','ab');
+  path('M504,420 L552,455',red,'5 3','ab');
+  E('text',{x:676,y:626,'text-anchor':'end','font-size':10.2,'font-weight':700,fill:red},'GAME OVER (lose) → retry');
+  E('text',{x:676,y:640,'text-anchor':'end','font-size':9.4,fill:red},'from the last checkpoint');
+  E('rect',{x:6,y:470,width:13,height:13,fill:'#fff',stroke:teal});E('text',{x:26,y:481,'font-size':10,fill:'#3a4448'},'stage');
+  E('rect',{x:6,y:490,width:13,height:13,fill:dark});E('text',{x:26,y:501,'font-size':10,fill:'#3a4448'},'system / enemy');
+  E('rect',{x:6,y:510,width:13,height:13,fill:red});E('text',{x:26,y:521,'font-size':10,fill:'#3a4448'},'failure state');
+})();
+/* only-page: ?p=N shows a single page (used for visual QA screenshots) */
+(function(){const m=/[?&]p=(\d+)/.exec(location.search); if(!m) return; const n=+m[1]; document.querySelectorAll(".page").forEach((p,i)=>{if(i!==n)p.style.display="none"}); document.body.style.margin="0";})();
+</script>
+</body>
+</html>
+
+
+
+
+

@@ -1,0 +1,9 @@
+﻿UPLOAD TO ITCH.IO  (رفع اللعبة على itch.io)
+1. itch.io > Dashboard > Create new project.
+2. Kind of project: Downloadable.   (Not HTML5 - this is a native Windows build.)
+3. Uploads > Upload files > choose  ROOM13_Windows.zip  > tick "Windows".
+4. Pricing / visibility as you like, add screenshots + the cover image, then Save and view page.
+   Test the download once from the page before making it Public.
+The zip has no wrapper folder: README.txt, ROOM13_Launcher.exe, Game/ and .itch.toml are at its root
+(.itch.toml tells the itch desktop app to start Game/ROOM13.exe with "Play" and the launcher as a second action).
+Unsigned exe: players may see a Windows SmartScreen warning (More info > Run anyway); mention it on the page.
