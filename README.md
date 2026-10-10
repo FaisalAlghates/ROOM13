@@ -1,4 +1,4 @@
-﻿<p align="center"><img src="docs/ROOM13_Poster_web_1200x1800.jpg" width="420" alt="ROOM 13 poster"></p>
+<p align="center"><img src="docs/ROOM13_Poster_web_1200x1800.jpg" width="420" alt="ROOM 13 poster"></p>
 
 # ROOM 13
 
@@ -13,11 +13,15 @@ It is 3:17 AM. You are Patient 013. Something tall and silent only moves when yo
 - Always-visible route marker (distance + edge arrow)
 - Final-chase **slide**: sprint, then press `C` / `Ctrl`
 
+## Download
+- **Windows build (v1.0, 58 MB):** [ROOM13_Windows.zip](https://github.com/FaisalAlghates/ROOM13/releases/download/v1.0/ROOM13_Windows.zip) - [Releases page](https://github.com/FaisalAlghates/ROOM13/releases)
+- Also on itch.io: https://engfaisalalghates.itch.io/room13
+- Unzip, then run `ROOM13_Launcher.exe` (or `Game\ROOM13.exe`).
 ## Controls
 `WASD` move · `Mouse` look · `Shift` sprint · `C`/`Ctrl` crouch (slide while sprinting in the last stage) · `E` interact / hide · `F` flashlight · `R` change battery · `G` / `RMB` throw · `Tab` phone / map · `H` hint · `Esc` pause · `F11` window / fullscreen · `L` language (menu)
 
 ## What is in this repository
-This repo holds the **source of the modifications and the documents**. The game binaries are not stored here (they are large) - download the Windows build from the itch.io page / Releases.
+This repo holds the **source of the modifications and the documents**. The game binaries are not stored here (they are large) - download the Windows build from [Releases](https://github.com/FaisalAlghates/ROOM13/releases) or the itch.io page.
 
 | Path | Content |
 |---|---|
@@ -47,6 +51,6 @@ Design, code, procedural audio and level: **Eng. Faisal** (المهندس فيص
 ## بالعربي
 **ROOM 13** لعبة رعب نفسي بمنظور الشخص الأول لنظام Windows. الساعة 3:17 فجرًا، وأنت المريض 013 في مستشفى فيه باب ثالث عشر لا ينبغي أن يوجد. كائن طويل لا يتحرك إلا حين لا تنظر إليه ولا يتحمّل الضوء، فأبقِ الضوء عليه واهرب.
 
-هذا المستودع يحوي أكواد التعديلات والوثائق (وثيقة تصميم اللعبة GDD والبوستر واللقطات). ملف اللعبة نفسه لا يُحفظ هنا بسبب حجمه، وتجده في صفحة itch.io أو Releases.
+هذا المستودع يحوي أكواد التعديلات والوثائق (وثيقة تصميم اللعبة GDD والبوستر واللقطات). ملف اللعبة نفسه لا يُحفظ هنا بسبب حجمه، وتجده في [Releases](https://github.com/FaisalAlghates/ROOM13/releases) أو صفحة itch.io.
 
 التحكم: W A S D حركة · Shift ركض · C أو Ctrl انحناء / انزلاق أثناء الركض في المرحلة الأخيرة · E تفاعل · F الكشاف · R بطارية · G رمي · Tab الهاتف والخريطة · H تلميح · L اللغة.
