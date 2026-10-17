@@ -1,4 +1,5 @@
 name: Showcase site (GitHub Pages)
+# (re-run after enabling Pages)
 
 # https://faisalalghates.github.io/ROOM13/ : the game is a Windows build, so this page shows it (it cannot be played in the browser)
 on:
