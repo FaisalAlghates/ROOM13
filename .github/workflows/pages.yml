@@ -1,0 +1,40 @@
+name: Showcase site (GitHub Pages)
+
+# https://faisalalghates.github.io/ROOM13/ : the game is a Windows build, so this page shows it (it cannot be played in the browser)
+on:
+  push:
+    branches: [main]
+    paths: ['site/**', 'docs/**', '.github/workflows/pages.yml']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Assemble the site
+        run: |
+          mkdir -p out/media
+          cp site/index.html out/
+          cp docs/screenshots/*.jpg out/media/
+          cp docs/source/hero_nohud.jpg out/media/hero.jpg
+          cp docs/ROOM13_Poster_web_1200x1800.jpg out/media/poster.jpg
+          cp docs/ROOM13_Game_Design_Document.pdf out/media/
+          touch out/.nojekyll
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: out
+      - id: deployment
+        uses: actions/deploy-pages@v4
